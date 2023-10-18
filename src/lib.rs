@@ -24,26 +24,19 @@ pub struct Transform2dPlugin;
 
 impl Plugin for Transform2dPlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<Transform2d>()
-            // Add transform2d sync system to startup so the first update is "correct"
-            .add_startup_system(
-                sync_transform_2d_to_3d
-                    .in_base_set(StartupSet::PostStartup)
-                    .before(TransformSystem::TransformPropagate),
-            )
-            .add_system(
-                sync_transform_2d_to_3d
-                    .in_base_set(CoreSet::PostUpdate)
-                    .before(TransformSystem::TransformPropagate),
-            );
+        app.register_type::<Transform2d>().add_systems(
+            Startup,
+            (
+                sync_transform_2d_to_3d.before(TransformSystem::TransformPropagate),
+                // sync_transform_2d_to_3d.before(TransformSystem::TransformPropagate),
+            ),
+        );
 
         #[cfg(feature = "bevy_rapier2d")]
         {
             use bevy_rapier2d::{
                 pipeline::CollisionEvent,
-                plugin::{
-                    systems::writeback_rigid_bodies, PhysicsSet, RapierTransformPropagateSet,
-                },
+                plugin::{systems::writeback_rigid_bodies, RapierTransformPropagateSet},
             };
             use systems::sync_transform_3d_to_2d;
 
@@ -58,15 +51,12 @@ impl Plugin for Transform2dPlugin {
                 );
             }
 
-            app.add_system(
-                sync_transform_2d_to_3d
-                    .in_base_set(PhysicsSet::SyncBackend)
-                    .before(RapierTransformPropagateSet),
-            )
-            .add_system(
-                sync_transform_3d_to_2d
-                    .in_base_set(PhysicsSet::Writeback)
-                    .after(writeback_rigid_bodies),
+            app.add_systems(
+                Update,
+                (
+                    sync_transform_2d_to_3d.before(RapierTransformPropagateSet),
+                    sync_transform_3d_to_2d.after(writeback_rigid_bodies),
+                ),
             );
         }
     }
