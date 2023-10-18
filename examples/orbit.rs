@@ -5,10 +5,9 @@ fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
-        .add_plugin(Transform2dPlugin)
-        .add_startup_system(setup)
-        .add_system(orbit)
-        .add_system(rotate)
+        .add_plugins(Transform2dPlugin)
+        .add_systems(Startup, setup)
+        .add_systems(Update, (orbit, rotate))
         .run();
 }
 
