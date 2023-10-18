@@ -28,7 +28,7 @@ impl Plugin for Transform2dPlugin {
             Startup,
             (
                 sync_transform_2d_to_3d.before(TransformSystem::TransformPropagate),
-                // sync_transform_2d_to_3d.before(TransformSystem::TransformPropagate),
+                sync_transform_2d_to_3d.before(TransformSystem::TransformPropagate),
             ),
         );
 
