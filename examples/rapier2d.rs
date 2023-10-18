@@ -5,11 +5,11 @@ use bevy_rapier2d::prelude::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
-        .add_plugin(RapierDebugRenderPlugin::default())
-        // Add the Transform2dPlugin after the RapierPhysicsPlugin.
-        .add_plugin(Transform2dPlugin)
-        .add_startup_system(setup)
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
+        .add_plugins(RapierDebugRenderPlugin::default())
+        // Add the Transform2dPlugin after the RapierPhysicsPlugin!
+        .add_plugins(Transform2dPlugin)
+        .add_systems(Startup, setup)
         .run();
 }
 

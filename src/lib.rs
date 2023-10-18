@@ -6,6 +6,7 @@ pub mod bundle;
 pub mod systems;
 pub mod transform2d;
 
+use bevy_rapier2d::prelude::PhysicsSet;
 use transform2d::Transform2d;
 
 use crate::systems::sync_transform_2d_to_3d;
@@ -25,11 +26,8 @@ pub struct Transform2dPlugin;
 impl Plugin for Transform2dPlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<Transform2d>().add_systems(
-            Startup,
-            (
-                sync_transform_2d_to_3d.before(TransformSystem::TransformPropagate),
-                sync_transform_2d_to_3d.before(TransformSystem::TransformPropagate),
-            ),
+            PostStartup,
+            sync_transform_2d_to_3d.before(TransformSystem::TransformPropagate),
         );
 
         #[cfg(feature = "bevy_rapier2d")]
@@ -52,11 +50,16 @@ impl Plugin for Transform2dPlugin {
             }
 
             app.add_systems(
-                Update,
-                (
-                    sync_transform_2d_to_3d.before(RapierTransformPropagateSet),
-                    sync_transform_3d_to_2d.after(writeback_rigid_bodies),
-                ),
+                PostUpdate,
+                sync_transform_2d_to_3d
+                    .in_set(PhysicsSet::SyncBackend)
+                    .before(RapierTransformPropagateSet),
+            );
+            app.add_systems(
+                PostUpdate,
+                sync_transform_3d_to_2d
+                    .in_set(PhysicsSet::Writeback)
+                    .after(writeback_rigid_bodies),
             );
         }
     }
