@@ -19,3 +19,15 @@ pub fn sync_transform_3d_to_2d(
         *transform_2d = transform_3d.into();
     }
 }
+
+pub fn ensure_transform2d(
+    mut commands: Commands,
+    query: Query<(Entity, &Transform2d), Without<Transform>>,
+) {
+    for (e, transform) in query.iter() {
+        commands.entity(e).insert({
+            let t: Transform = transform.clone().into();
+            t
+        });
+    }
+}
