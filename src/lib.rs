@@ -6,6 +6,7 @@ pub mod bundle;
 pub mod systems;
 pub mod transform2d;
 
+#[cfg(feature = "rapier")]
 use bevy_rapier2d::prelude::PhysicsSet;
 use transform2d::Transform2d;
 
@@ -30,7 +31,7 @@ impl Plugin for Transform2dPlugin {
             sync_transform_2d_to_3d.before(TransformSystem::TransformPropagate),
         );
 
-        #[cfg(feature = "bevy_rapier2d")]
+        #[cfg(feature = "rapier")]
         {
             use bevy_rapier2d::{
                 pipeline::CollisionEvent,
