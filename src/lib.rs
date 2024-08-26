@@ -7,7 +7,9 @@ pub mod systems;
 pub mod transform2d;
 
 #[cfg(feature = "rapier")]
-use bevy_rapier2d::prelude::PhysicsSet;
+use bevy_rapier2d::plugin::{
+    systems::writeback_rigid_bodies, PhysicsSet, RapierTransformPropagateSet,
+};
 use systems::sync_transform_3d_to_2d;
 use transform2d::Transform2d;
 
