@@ -8,6 +8,7 @@ pub mod transform2d;
 
 #[cfg(feature = "rapier")]
 use bevy_rapier2d::prelude::PhysicsSet;
+use systems::sync_transform_3d_to_2d;
 use transform2d::Transform2d;
 
 use crate::systems::sync_transform_2d_to_3d;
@@ -40,7 +41,7 @@ impl Plugin for Transform2dPlugin {
             use systems::sync_transform_3d_to_2d;
 
             if app
-                .world
+                .world()
                 .get_resource::<bevy::ecs::event::Events<CollisionEvent>>()
                 .is_none()
             {
@@ -49,19 +50,24 @@ impl Plugin for Transform2dPlugin {
                     Make sure to add the Transform2dPlugin after the RapierPhysicsPlugin."
                 );
             }
-
-            app.add_systems(
-                PostUpdate,
-                sync_transform_2d_to_3d
-                    .in_set(PhysicsSet::SyncBackend)
-                    .before(RapierTransformPropagateSet),
-            );
-            app.add_systems(
-                PostUpdate,
-                sync_transform_3d_to_2d
-                    .in_set(PhysicsSet::Writeback)
-                    .after(writeback_rigid_bodies),
-            );
         }
+        app.add_systems(
+            PostUpdate,
+            #[cfg(feature = "rapier")]
+            sync_transform_2d_to_3d
+                .in_set(PhysicsSet::SyncBackend)
+                .before(RapierTransformPropagateSet),
+            #[cfg(not(feature = "rapier"))]
+            sync_transform_2d_to_3d,
+        );
+        app.add_systems(
+            PostUpdate,
+            #[cfg(feature = "rapier")]
+            sync_transform_3d_to_2d
+                .in_set(PhysicsSet::Writeback)
+                .after(writeback_rigid_bodies),
+            #[cfg(not(feature = "rapier"))]
+            sync_transform_3d_to_2d.after(sync_transform_2d_to_3d),
+        );
     }
 }
