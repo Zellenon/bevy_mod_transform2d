@@ -1,10 +1,12 @@
 use bevy::prelude::*;
 use bevy_mod_transform2d::prelude::*;
+use bevy_rapier2d::plugin::{NoUserData, RapierPhysicsPlugin};
 
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugins(Transform2dPlugin)
         .add_systems(Startup, setup)
         .add_systems(Update, (orbit, rotate))
@@ -27,7 +29,7 @@ fn setup(mut commands: Commands) {
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::CRIMSON,
+                color: Color::srgb(1.0, 0.05, 0.05),
                 custom_size: Some(Vec2::splat(50.)),
                 ..default()
             },
@@ -41,7 +43,7 @@ fn setup(mut commands: Commands) {
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::LIME_GREEN,
+                color: Color::srgb(0.15, 1.0, 0.2),
                 custom_size: Some(Vec2::splat(150.)),
                 ..default()
             },
